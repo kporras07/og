@@ -70,7 +70,7 @@ class OgMembershipType extends ConfigEntityBase implements OgMembershipTypeInter
   public function save() {
     $status = parent::save();
 
-    if (\Drupal::isConfigSyncing()) {
+    if ($this->isSyncing()) {
       // Do not create config while config import is in progress.
       return;
     }
