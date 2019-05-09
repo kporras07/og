@@ -13,7 +13,7 @@ use Drupal\og\OgMembershipInterface;
 use Drupal\og\OgMembershipTypeInterface;
 
 /**
- * Determines access to for membership add pages.
+ * Check if a user has access to the group's membership pages.
  */
 class OgMembershipAddAccessCheck implements AccessInterface {
 
