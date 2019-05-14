@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Drupal\og\Entity;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\ContentEntityBase;
-use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -93,7 +95,7 @@ class OgMembership extends ContentEntityBase implements OgMembershipInterface {
   /**
    * {@inheritdoc}
    */
-  protected function urlRouteParameters($rel) {
+  protected function urlRouteParameters($rel): array {
     $uri_route_parameters = parent::urlRouteParameters($rel);
     $uri_route_parameters['entity_type_id'] = $this->getGroupEntityType();
     $uri_route_parameters['group'] = $this->getGroupId();
@@ -103,14 +105,14 @@ class OgMembership extends ContentEntityBase implements OgMembershipInterface {
   /**
    * {@inheritdoc}
    */
-  public function getCreatedTime() {
+  public function getCreatedTime(): int {
     return $this->get('created')->value;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setCreatedTime($timestamp) {
+  public function setCreatedTime(int $timestamp): OgMembershipInterface {
     $this->set('created', $timestamp);
     return $this;
   }
@@ -119,6 +121,7 @@ class OgMembership extends ContentEntityBase implements OgMembershipInterface {
    * {@inheritdoc}
    */
   public function getOwner() {
+    assert(!empty($this->get('uid')->entity), new \LogicException(__METHOD__ . '() should only be called on loaded memberships, or on newly created memberships that already have the owner set.'));
     return $this->get('uid')->entity;
   }
 
@@ -126,6 +129,7 @@ class OgMembership extends ContentEntityBase implements OgMembershipInterface {
    * {@inheritdoc}
    */
   public function getOwnerId() {
+    assert(!empty($this->get('uid')->entity), new \LogicException(__METHOD__ . '() should only be called on loaded memberships, or on newly created memberships that already have the owner set.'));
     return $this->get('uid')->target_id;
   }
 
@@ -148,7 +152,7 @@ class OgMembership extends ContentEntityBase implements OgMembershipInterface {
   /**
    * {@inheritdoc}
    */
-  public function setGroup(EntityInterface $group) {
+  public function setGroup(ContentEntityInterface $group): OgMembershipInterface {
     $this->set('entity_type', $group->getEntityTypeId());
     $this->set('entity_bundle', $group->bundle());
     $this->set('entity_id', $group->id());
@@ -158,21 +162,24 @@ class OgMembership extends ContentEntityBase implements OgMembershipInterface {
   /**
    * {@inheritdoc}
    */
-  public function getGroupEntityType() {
+  public function getGroupEntityType(): string {
+    assert(!empty($this->get('entity_type')->value), new \LogicException(__METHOD__ . '() should only be called on loaded memberships, or on newly created memberships that already have the group type set.'));
     return $this->get('entity_type')->value;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getGroupBundle() {
+  public function getGroupBundle(): string {
+    assert(!empty($this->get('entity_bundle')->value), new \LogicException(__METHOD__ . '() should only be called on loaded memberships, or on newly created memberships that already have the group bundle set.'));
     return $this->get('entity_bundle')->value;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getGroupId() {
+  public function getGroupId(): string {
+    assert(!empty($this->get('entity_id')->value), new \LogicException(__METHOD__ . '() should only be called on loaded memberships, or on newly created memberships that already have the group ID set.'));
     return $this->get('entity_id')->value;
   }
 
@@ -193,20 +200,17 @@ class OgMembership extends ContentEntityBase implements OgMembershipInterface {
    * @return bool
    *   Whether or not the group is already present.
    */
-  protected function hasGroup() {
+  protected function hasGroup(): bool {
     return !empty($this->get('entity_type')->value) && !empty($this->get('entity_bundle')->value) && !empty($this->get('entity_id')->value);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getGroup() {
+  public function getGroup(): ?ContentEntityInterface {
+    assert(!empty($this->get('entity_type')->value) || !empty($this->get('entity_id')->value), new \LogicException(__METHOD__ . '() should only be called on loaded memberships, or on newly created memberships that already have the group set.'));
     $entity_type = $this->get('entity_type')->value;
     $entity_id = $this->get('entity_id')->value;
-
-    if (empty($entity_type) || empty($entity_id)) {
-      return NULL;
-    }
 
     return \Drupal::entityTypeManager()->getStorage($entity_type)->load($entity_id);
   }
@@ -214,7 +218,7 @@ class OgMembership extends ContentEntityBase implements OgMembershipInterface {
   /**
    * {@inheritdoc}
    */
-  public function setState($state) {
+  public function setState(string $state): OgMembershipInterface {
     $this->set('state', $state);
     return $this;
   }
@@ -222,21 +226,21 @@ class OgMembership extends ContentEntityBase implements OgMembershipInterface {
   /**
    * {@inheritdoc}
    */
-  public function getState() {
+  public function getState(): string {
     return $this->get('state')->value;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getType() {
+  public function getType(): string {
     return $this->bundle();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function addRole(OgRoleInterface $role) {
+  public function addRole(OgRoleInterface $role): OgMembershipInterface {
     $roles = $this->getRoles();
     $roles[] = $role;
 
@@ -246,14 +250,14 @@ class OgMembership extends ContentEntityBase implements OgMembershipInterface {
   /**
    * {@inheritdoc}
    */
-  public function revokeRole(OgRoleInterface $role) {
+  public function revokeRole(OgRoleInterface $role): OgMembershipInterface {
     return $this->revokeRoleById($role->id());
   }
 
   /**
    * {@inheritdoc}
    */
-  public function revokeRoleById($role_id) {
+  public function revokeRoleById(string $role_id): OgMembershipInterface {
     $roles = $this->getRoles();
 
     foreach ($roles as $key => $existing_role) {
@@ -271,7 +275,7 @@ class OgMembership extends ContentEntityBase implements OgMembershipInterface {
   /**
    * {@inheritdoc}
    */
-  public function getRoles() {
+  public function getRoles(): array {
     $roles = [];
 
     // Add the member role. This is only possible if a group has been set on the
@@ -288,7 +292,7 @@ class OgMembership extends ContentEntityBase implements OgMembershipInterface {
   /**
    * {@inheritdoc}
    */
-  public function setRoles(array $roles = []) {
+  public function setRoles(array $roles = []): OgMembershipInterface {
     $roles = array_filter($roles, function (OgRole $role) {
       return !($role->getName() == OgRoleInterface::AUTHENTICATED);
     });
@@ -304,7 +308,7 @@ class OgMembership extends ContentEntityBase implements OgMembershipInterface {
   /**
    * {@inheritdoc}
    */
-  public function getRolesIds() {
+  public function getRolesIds(): array {
     return array_map(function (OgRole $role) {
       return $role->id();
     }, $this->getRoles());
@@ -313,7 +317,7 @@ class OgMembership extends ContentEntityBase implements OgMembershipInterface {
   /**
    * {@inheritdoc}
    */
-  public function isRoleValid(OgRoleInterface $role) {
+  public function isRoleValid(OgRoleInterface $role): bool {
     $group = $this->getGroup();
 
     // If there is no group yet then we cannot determine whether the role is
@@ -339,14 +343,14 @@ class OgMembership extends ContentEntityBase implements OgMembershipInterface {
   /**
    * {@inheritdoc}
    */
-  public function hasRole($role_id) {
+  public function hasRole(string $role_id): bool {
     return in_array($role_id, $this->getRolesIds());
   }
 
   /**
    * {@inheritdoc}
    */
-  public function hasPermission($permission) {
+  public function hasPermission(string $permission): bool {
     // Blocked users do not have any permissions.
     if ($this->isBlocked()) {
       return FALSE;
@@ -585,28 +589,28 @@ class OgMembership extends ContentEntityBase implements OgMembershipInterface {
   /**
    * {@inheritdoc}
    */
-  public function isActive() {
+  public function isActive(): bool {
     return $this->getState() === OgMembershipInterface::STATE_ACTIVE;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function isPending() {
+  public function isPending(): bool {
     return $this->getState() === OgMembershipInterface::STATE_PENDING;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function isBlocked() {
+  public function isBlocked(): bool {
     return $this->getState() === OgMembershipInterface::STATE_BLOCKED;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function isOwner() {
+  public function isOwner(): bool {
     $group = $this->getGroup();
     return $group instanceof EntityOwnerInterface && $group->getOwnerId() == $this->getOwnerId();
   }
