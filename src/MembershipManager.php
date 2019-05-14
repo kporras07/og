@@ -127,7 +127,7 @@ class MembershipManager implements MembershipManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function getGroupMembershipCount(EntityInterface $group, array $states = [OgMembershipInterface::STATE_ACTIVE])  {
+  public function getGroupMembershipCount(EntityInterface $group, array $states = [OgMembershipInterface::STATE_ACTIVE]) {
     $query = $this->entityTypeManager
       ->getStorage('og_membership')
       ->getQuery()
