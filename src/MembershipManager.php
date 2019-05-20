@@ -141,7 +141,7 @@ class MembershipManager implements MembershipManagerInterface {
 
     return $query->execute();
   }
-  
+
   /**
    * {@inheritdoc}
    */
