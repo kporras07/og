@@ -55,7 +55,7 @@ class OgUserSelection extends DefaultSelection {
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity manager service.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler service.
@@ -66,11 +66,11 @@ class OgUserSelection extends DefaultSelection {
    * @param \Drupal\og\MembershipManagerInterface $membership_manager
    *   The OG membership manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityManagerInterface $entity_manager, ModuleHandlerInterface $module_handler, AccountInterface $current_user, Connection $connection, MembershipManagerInterface $membership_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler, AccountInterface $current_user, Connection $connection, MembershipManagerInterface $membership_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $entity_manager, $module_handler, $current_user);
 
     $this->connection = $connection;
-    $this->userStorage = $entity_manager->getStorage('user');
+    $this->userStorage = $entity_type_manager->getStorage('user');
     $this->membershipManager = $membership_manager;
   }
 
@@ -82,7 +82,7 @@ class OgUserSelection extends DefaultSelection {
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('entity.manager'),
+      $container->get('entity_type.manager'),
       $container->get('module_handler'),
       $container->get('current_user'),
       $container->get('database'),
