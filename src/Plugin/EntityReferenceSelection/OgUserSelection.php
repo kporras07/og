@@ -67,7 +67,7 @@ class OgUserSelection extends DefaultSelection {
    *   The OG membership manager.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler, AccountInterface $current_user, Connection $connection, MembershipManagerInterface $membership_manager) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $entity_manager, $module_handler, $current_user);
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $entity_type_manager, $module_handler, $current_user);
 
     $this->connection = $connection;
     $this->userStorage = $entity_type_manager->getStorage('user');
