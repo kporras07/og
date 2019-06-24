@@ -16,7 +16,7 @@ class OgMembershipDeleteForm extends ContentEntityDeleteForm {
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     $membership = $this->getEntity();
 
-    return $this->t("%user has been unsubscribed from %group.", [
+    return $this->t('%user has been unsubscribed from %group.', [
       '%user' => $membership->getOwner()->getDisplayName(),
       '%group' => $membership->getGroup()->label(),
     ]);
@@ -29,7 +29,7 @@ class OgMembershipDeleteForm extends ContentEntityDeleteForm {
     /** @var \Drupal\og\Entity\OgMembership $entity */
     $membership = $this->getEntity();
 
-    $this->logger('og')->notice("OG Membership: deleted the @membership_type membership for the user uid: @uid to the group of the entity-type @group_type and ID: @gid", [
+    $this->logger('og')->notice('OG Membership: deleted the @membership_type membership for the user uid: @uid to the group of the entity-type @group_type and ID: @gid', [
       '@membership_type' => $membership->getType(),
       '@uid' => $membership->getOwner()->id(),
       '@group_type' => $membership->getGroupEntityType(),
@@ -44,7 +44,7 @@ class OgMembershipDeleteForm extends ContentEntityDeleteForm {
     /** @var \Drupal\og\Entity\OgMembership $entity */
     $membership = $this->getEntity();
 
-    return $this->t("Are you sure you want to unsubscribe %user from %group?", [
+    return $this->t('Are you sure you want to unsubscribe %user from %group?', [
       '%user' => $membership->getOwner()->getDisplayName(),
       '%group' => $membership->getGroup()->label(),
     ]);
