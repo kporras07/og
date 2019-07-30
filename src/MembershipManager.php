@@ -148,6 +148,24 @@ class MembershipManager implements MembershipManagerInterface {
   /**
    * {@inheritdoc}
    */
+  public function getGroupMembershipCount(EntityInterface $group, array $states = [OgMembershipInterface::STATE_ACTIVE]) {
+    $query = $this->entityTypeManager
+      ->getStorage('og_membership')
+      ->getQuery()
+      ->condition('entity_id', $group->id());
+
+    if ($states) {
+      $query->condition('state', $states, 'IN');
+    }
+
+    $query->count();
+
+    return $query->execute();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getUserGroupIdsByRoleIds($user_id, array $role_ids, array $states = [OgMembershipInterface::STATE_ACTIVE], bool $require_all_roles = TRUE): array {
     if ($user_id instanceof AccountInterface) {
       trigger_error('Passing an account object is deprecated in og:8.1.0-alpha4 and is removed from og:8.1.0-beta1. Instead pass the user ID as an integer value. See https://github.com/Gizra/og/issues/542', E_USER_DEPRECATED);
